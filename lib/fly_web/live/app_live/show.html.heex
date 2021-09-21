@@ -1,0 +1,377 @@
+<div class="bg-gray-200">
+  <div class="app-main">
+    <nav class="bg-gradient-to-r from-blue-700 to-indigo-600">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div>
+          <div class="flex items-center justify-between h-16 px-4 sm:px-0">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+               <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+              </div>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  <HeaderBreadcrumbs.render name={"michael"} breadcrumbs={[
+                    {"Apps", Routes.app_index_path(@socket, :index)},
+                    {@app_name, ""}
+                  ]} />
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+              <%= link to: Routes.delete_session_path(@socket, :delete), method: :delete,
+                class: "whitespace-nowrap text-base font-medium text-indigo-200 hover:text-indigo-100" do %>
+                Sign Out
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <header class="py-5 border-b border-gray-300">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-normal leading-7 text-white-900 sm:text-3xl sm:truncate">
+              <%= @app_name %>
+              <p class={"px-2 mx-4 inline-flex text-xs leading-5 font-semibold rounded-full #{status_bg_color(@app)} #{status_text_color(@app)}"}>
+                <%= @app["status"] %>
+              </p>
+            </h2>
+            <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+              <div class="mt-2 flex items-center text-sm text-gray-500">
+                <%= @app["organization"]["slug"] %>
+              </div>
+              <div class="mt-2 flex items-center text-sm text-gray-500">
+                <div class="ml-2 flex-shrink-0 flex">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 flex lg:mt-0 lg:ml-4">
+            <%= if @app["deployed"] == true do %>
+              <span class="hidden sm:block ml-3">
+                <%= link to: preview_url(@app), target: "_blank", class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                  <!-- Heroicon name: solid/link -->
+                  <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                  </svg>
+                  View
+                <% end %>
+              </span>
+            <% end %>
+          </div>
+      </div>
+    </header>
+  </div>
+
+  <%= if @app do %>
+    <main class="mt-2">
+      <div class="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+        <div class="space-y-6 lg:col-start-1 lg:col-span-2">
+          <!-- Description list-->
+          <section>
+            <div class="bg-white shadow sm:rounded-lg">
+              <div class="border-b border-gray-300 px-4 py-5 sm:px-6 shadow-md">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">
+                  Instances
+                </h2>
+              </div>
+              <div class="px-4 py-5 sm:px-6">
+                <div class="sm:col-span-2">
+                  <dd class="mt-1 text-sm text-gray-900">
+                    <div class="flex flex-col">
+                      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                          <div class="overflow-hidden">
+                            <!-- //////////////////////////////////////////// -->
+                            <%= for appstat <- @app_status["allocations"] do %>
+                            <div class="p-4">
+                              <div class="max-w-full  bg-white flex flex-col rounded overflow-hidden shadow-md">
+                                <div class="flex flex-row items-baseline flex-nowrap bg-gray-100 p-2">
+                                  <h1 class="ml-2 uppercase font-bold text-gray-500"> 
+                                    <%= appstat["taskName"] %>
+                                  </h1>
+                                  <p class="ml-2 font-normal text-gray-500">
+                                    <%= " v" <>  to_string(appstat["version"]) <>". " <> "ID: " <> appstat["idShort"] %> 
+                                  </p>
+                                </div>
+                                <div class="mt-2 flex justify-start bg-white p-2">
+                                  <!-- ///Status -->
+                                  <%= if appstat["status"] == "running" do %>
+                                    <div class="flex mx-2 ml-6 h8 px-2 flex-row items-baseline rounded-full bg-green-400 p-1">
+                                      <p class="font-normal text-sm ml-1 text-white"><%= appstat["status"] %></p>
+                                    </div>
+                                  <% else %>
+                                    <div class="flex mx-2 ml-6 h8 px-2 flex-row items-baseline rounded-full bg-yellow-400 p-1">
+                                      <p class="font-normal text-sm ml-1 text-white"><%= appstat["status"] %></p>
+                                    </div>                                  
+                                  <% end %>
+                                </div>
+                                <!-- ///End-Status -->
+
+                                <div class="mt-2 flex sm:flex-row mx-6 sm:justify-between flex-wrap ">
+                                  <div class="flex flex-col flex-wrap p-2">
+                                    <p class="font-bold text-gray-500">
+                                      REGION
+                                    </p>
+                                    <p class="text-gray-500">
+                                      <span class="font-bold"><%= appstat["region"] %></span>
+                                    </p>
+                                    <p class="text-gray-500">
+                                      <%= regions_friendly(appstat["region"]) %>
+                                    </p>        
+                                  </div>
+
+                                  <div class="flex flex-col p-2">
+                                    <p class="text-gray-500">
+                                      <span class="font-bold">Desired</span> 
+                                      <%= appstat["desiredStatus"] %>
+                                    </p>
+                                    <p class="text-gray-500">
+                                      <span class="font-bold">Restarts</span>
+                                      <%= appstat["restarts"] %>
+                                    </p>             
+                                  </div>
+
+                                  <div class="flex flex-col flex-wrap p-2">
+                                    <p class="text-gray-500">
+                                      <span class="font-bold">Deployed</span> 
+                                      <%= datetime_friendly(appstat["createdAt"]) %>
+                                    </p>
+                                    <p class="text-gray-500">
+                                      <span class="font-bold">Updated</span>
+                                      <%= updated_duration(appstat["updatedAt"]) %>
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div class=" mx-6 items-baseline border-t p-2"> 
+                                  <p class=" uppercase ml-2 font-bold text-gray-500"> 
+                                    Health Checks
+                                  </p>
+                                  <div class="flex space-x-2">   
+                                    <div class="flex-1 ml-2 text-gray-500 ">
+                                      <p class="font-bold">Name</p>
+                                      <%= for checks_map <- Map.get(appstat, "checks") do %>
+                                            <p><%= checks_map["name"] %></p>
+                                      <% end %>
+                                    </div>
+                                    <div class="flex-1 ml-2 text-gray-500 ">
+                                      <p class="font-bold">Status</p>
+                                      <%= for checks_map <- Map.get(appstat, "checks") do %>
+                                            <p><%= checks_map["status"] %></p>
+                                      <% end %>
+                                    </div>                                                                                                          
+                                    <%= if appstat["healthy"] == true do %>
+                                      <p class="flex-1">                                  
+                                        <span class="material-icons inline-block align-middle" >
+                                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#10B981">
+                                            <path d="M0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none"/>
+                                            <path d="M16.59 7.58L10 14.17l-3.59-3.58L5 12l5 5 8-8zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                                          </svg>
+                                        </span>
+                                        <span class="inline-block align-middle text-green-600">Healthy</span>                                       
+                                    <% else %>
+                                        <span class="material-icons inline-block align-middle">
+                                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#EF4444">
+                                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                                            <path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                                          </svg>
+                                        </span>
+                                        <span class="inline-block align-middle text-red-600 ">Unstable</span>
+                                      </p>  
+                                    <% end %>
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+                            <% end %>
+                            <!-- //////////////////////////////////////////// -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </dd>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+<!-- ///Sidebar Begins --->
+        <section aria-labelledby="timeline-title" class="lg:col-start-3 lg:col-span-1">
+          <div class="bg-white px-4 py-5 shadow mb-8 sm:rounded-lg sm:px-6">
+            <h2 id="timeline-title" class="text-lg font-medium text-gray-900">System Resource</h2> 
+            <!-- Resource Info -->
+            <div class="mt-6 flow-root">
+              <ul role="list" class="-mb-8">
+                <%= for pg <- @app["processGroups"] do %>
+                  <li>
+                    <div class="relative pb-8">
+                      <div class="relative flex space-x-3">
+                        <div>
+                          <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white">
+                              <!-- Heroicon name: solid/user -->
+                              <svg class="material-icons w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#CCCCCC">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/>
+                              </svg>
+                          </span>
+                        </div>
+
+                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                          <div>
+                            <p class="text-sm text-gray-500">CPU Type</p>
+                          </div>
+                          <div>
+                            <p class="text-sm text-gray-500"><%= pg["vmSize"]["name"] %></p>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="relative pb-8">
+                      <div class="relative flex space-x-3">
+                        <div>
+                          <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white">
+                              <svg class="material-icons w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#CCCCCC">
+                                <g fill-rule="evenodd">
+                                  <path d="M0 0h24v24H0z" fill="none"/>
+                                  <path d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"/>
+                                </g>
+                              </svg>
+                          </span>
+                        </div>
+
+                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                          <div>
+                            <p class="text-sm text-gray-500">CPU Cores</p>
+                          </div>
+                          <div>
+                            <p class="text-sm text-gray-500"><%= pg["vmSize"]["cpuCores"] %></p>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </li>
+
+                  <li>
+                    <div class="relative pb-8">
+                      <div class="relative flex space-x-3">
+                        <div>
+                          <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white">
+                 
+                              <svg class="material-icons w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#CCCCCC">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M18 2h-8L4.02 8 4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-6 6h-2V4h2v4zm3 0h-2V4h2v4zm3 0h-2V4h2v4z"/>
+                              </svg>
+                          </span>
+                        </div>
+
+                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                          <div>
+                            <p class="text-sm text-gray-500">Memory</p>
+                          </div>
+                          <div>
+                            <p class="text-sm text-gray-500"><%= to_string(pg["vmSize"]["memoryMb"]) <> "MB"%></p>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </li>                                    
+                <% end %>
+              </ul>
+            </div>
+          </div>
+                  
+          <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+            <h2 id="timeline-title" class="text-lg font-medium text-gray-900">Activity Log</h2>
+
+            <!-- Activity Log -->
+            <div class="mt-6 flow-root">
+              <table class="min-w-full text-left border-collapse">
+                  <thead>
+                      <tr>
+                          <th class="z-20 sticky top-0 font-mono text-xs uppercase font-light text-gray-600 bg-white p-0">
+                              <div class="pb-2 pr-2 border-b border-gray-200">&nbsp;</div>
+                          </th>
+                          <th class="z-20 sticky top-0 font-mono text-xs uppercase font-light text-gray-600 bg-white p-0">
+                              <div class="pb-2 pl-2 border-b border-gray-200">Action</div>
+                          </th>
+                          <th class="z-20 sticky top-0 font-mono text-xs uppercase font-light text-gray-600 bg-white p-0">
+                              <div class="pb-2 pl-2 border-b border-gray-200">Stable</div>
+                          </th> 
+                          <th class="z-20 sticky top-0 font-mono text-xs uppercase font-light text-gray-600 bg-white p-0">
+                              <div class="pb-2 pl-2 border-b border-gray-200">Version</div>
+                          </th> 
+                          <th class="z-20 sticky top-0 font-mono text-xs uppercase font-light text-gray-600 bg-white p-0">
+                              <div class="pb-2 pl-2 border-b border-gray-200">Deployed</div>
+                          </th>                                                                            
+                      </tr>
+                  </thead>
+                  <tbody class="align-baseline">
+                     <%= for release <- @app["releases"]["nodes"] do %>
+                      <tr>
+                          <td translate="no" class="py-2 pr-2 font-mono text-xs text-violet-600 whitespace-nowrap">
+                            <span class="h-5 w-5 rounded-full bg-white flex items-center justify-center ring-8 ring-white">
+                              <%= if release["stable"] do %>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#10B981">
+                                  <path d="M0 0h24v24H0z" fill="none"/>
+                                  <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                                </svg>
+                              <% else %>
+                                <!-- Heroicon name: solid/user -->
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#EF4444">
+                                  <path d="M0 0h24v24H0z" fill="none"/>
+                                  <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                                </svg>
+                              <% end %>
+                            </span>
+                          </td>
+                          <td translate="no" class="py-2 pl-2 font-mono text-xs text-light-blue-600 ">
+                              <%= release["reason"] %>
+                          </td>
+                          <td translate="no" class="py-2 pl-2 font-mono text-xs ">
+                              <%= if release["stable"] do %>
+                                <span class="text-green-600">yes</span>
+                              <% else %>
+                                <span class="text-red-600">no</span>
+                              <% end %>
+                          </td> 
+                          <td translate="no" class="py-2 pl-2 font-mono text-xs text-light-blue-600 ">
+                              v<%= release["version"] %>
+                          </td> 
+                          <td translate="no" class="py-2 pl-2 font-mono text-xs text-light-blue-600 ">
+                              <%= updated_duration(release["createdAt"]) %>
+                          </td>                                                                            
+                      </tr>
+                     <% end %> 
+                  </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-2 bg-white px-4 py-5 shadow mb-8 sm:rounded-lg sm:px-6">
+            <div class="min-w-0 pt-1.5 flex flex-1 justify-between space-x-4">
+                <div class="font-mono text-xs text-light-blue-600">
+                    <p class="text-sm text-gray-600">Live Refresh</p>
+                </div>
+                <div class="font-mono text-xs text-light-blue-600">
+                    <p class="text-sm text-gray-600"><%= @update_count %></p>
+                </div>
+            </div>
+          </div>
+
+        </section>        
+      </div>
+    </main>
+  <% end %>
+</div>
