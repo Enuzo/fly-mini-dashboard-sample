@@ -27,7 +27,7 @@ require a fairly complex pattern-matching to extract.
 - A scrollable content area for a possible long apps list with a fixed right-sidebar showing critical resource summary.
 - Better menu system-- instead of relying on breadcrumb for it's restrictive linear navigation experience.
 - Better code organization.
-- Have the homepage and other pages share a common root template for`<header>brand and menu bar</header>`
+- Have the homepage and other pages share a common root template for `<header>brand and menu bar</header>`
 
 ### Evidence for Successful execution
 **Logger:** Using Loggers extensively during development helped ensure that outputs are returning the right results at runtime.
