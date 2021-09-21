@@ -21,7 +21,7 @@ require a fairly complex pattern-matching to extract.
 
 **Type specs:** `@spec` was left out of function definitions for legibility.
 
-###Future Improvement and Fixes
+### Future Improvement and Fixes
 - A better novice-friendly user interface.
 - App instances needs a dedicated page because the list can get really long on mulitiple deployments, or:
 - A scrollable content area for a possible long apps list with a fixed right-sidebar showing critical resource summary.
